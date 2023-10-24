@@ -18,7 +18,10 @@ macro_rules! json_de_eq {
     }};
 }
 
+use std::error::Error;
 use tumblr_api::npf::*;
+
+
 
 #[test]
 fn content_block_text() {
@@ -69,6 +72,28 @@ fn text_subtype() {
         r#""unordered-list-item""#,
         TextSubtype::UnorderedListItem
     );
+}
+
+use tumblr_api::client::RequestError;
+#[tokio::test]
+async fn login() -> Result<(), RequestError> {
+    use tumblr_api::client::{Client, Credentials};
+    use tumblr_api::npf;
+
+    let client = Client::new(Credentials::new_oauth2(
+        include_str!("../key.env"),
+        include_str!("../secret.env"),
+    ));
+
+    client
+        .create_post(
+            "rhaskia",
+            vec![npf::ContentBlockText::builder("posted through the rust tumblr api!").build()],
+        )
+        .send()
+        .await?;
+    
+    Ok(())
 }
 
 #[test]
